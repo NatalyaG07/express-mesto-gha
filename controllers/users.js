@@ -19,3 +19,21 @@ module.exports.createUser = (req, res) => {
     .then(user => res.send({ data: user }))            // вернём записанные в базу данные
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
+
+module.exports.editProfile = (req, res) => {
+  User.findOneAndUpdate({ _id: '6322f4089a7a7fd010a62b7f' }, { name: req.body.name }, {
+    new: true,                                          // обработчик then получит на вход обновлённую запись
+    runValidators: true,                                // данные будут валидированы перед изменением
+})
+    .then(user => res.send({ data: user }))
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+};
+
+module.exports.editAvatar = (req, res) => {
+  User.findOneAndUpdate({ _id: '6322f4089a7a7fd010a62b7f' }, { avatar: req.body.avatar }, {
+    new: true,                                          // обработчик then получит на вход обновлённую запись
+    runValidators: true,                                // данные будут валидированы перед изменением
+})
+    .then(user => res.send({ data: user }))
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+};
