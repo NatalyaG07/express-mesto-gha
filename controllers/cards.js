@@ -39,16 +39,20 @@ module.exports.addLike = (req, res) => {
     { $addToSet: { likes: req.user._id } },         // добавить _id в массив, если его там нет
     { new: true },
   )
-  .then(card => res.send({ data: card }))
+  .then(card => {
+    if(card === null) {
+      return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
+    } else {
+      res.send({ data: card })
+    }
+  })
   .catch((err) => {
     if(err.name === 'CastError') {
       return res.status(ERROR_FIND).send({ message: `Карточка с id: ${req.params.cardId} не найдена` });
-    } else if (err.name === 'ValidationError') {
-      return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
     } else {
       return res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
     }
-  });
+});
 };
 
 module.exports.deleteLike = (req, res) => {
@@ -57,12 +61,16 @@ module.exports.deleteLike = (req, res) => {
     { $pull: { likes: req.user._id } },             // убрать _id из массива
     { new: true },
   )
-  .then(card => res.send({ data: card }))
+  .then(card => {
+    if(card === null) {
+      return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
+    } else {
+      res.send({ data: card })
+    }
+  })
   .catch((err) => {
     if(err.name === 'CastError') {
       return res.status(ERROR_FIND).send({ message: `Карточка с id: ${req.params.cardId} не найдена` });
-    } else if (err.name === 'ValidationError') {
-      return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
     } else {
       return res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
     }

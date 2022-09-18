@@ -9,7 +9,13 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
-    .then(user => res.send({ data: user }))
+    .then(user => {
+      if(user === null) {
+        return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
+      } else {
+        res.send({ data: user })
+      }
+    })
     .catch((err) => {
       if(err.name === 'CastError') {
         return res.status(ERROR_FIND).send({ message: `Пользователь с id: ${req.params.userId} не найден` });
@@ -34,7 +40,7 @@ module.exports.createUser = (req, res) => {
 };
 
 module.exports.editProfile = (req, res) => {
-  User.findOneAndUpdate({ _id: req.user._id }, { name: req.body.name }, {
+  User.findOneAndUpdate({ _id: req.user._id }, { name: req.body.name, about: req.body.about }, {
     new: true,                                          // обработчик then получит на вход обновлённую запись
     runValidators: true,                                // данные будут валидированы перед изменением
   })
