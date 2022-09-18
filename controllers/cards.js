@@ -23,7 +23,13 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .then(card => res.send({ data: card }))
+  .then(card => {
+    if(card === null) {
+      return res.status(ERROR_FIND).send({ message: `Карточка с id: ${req.params.cardId} не найдена` });
+    } else {
+      res.send({ data: card })
+    }
+  })
     .catch((err) => {
       if(err.name === 'CastError') {
         return res.status(ERROR_FIND).send({ message: `Карточка с id: ${req.params.cardId} не найдена` });
@@ -41,14 +47,14 @@ module.exports.addLike = (req, res) => {
   )
   .then(card => {
     if(card === null) {
-      return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
+      return res.status(ERROR_FIND).send({ message: `Карточка с id: ${req.params.cardId} не найдена` });
     } else {
       res.send({ data: card })
     }
   })
   .catch((err) => {
     if(err.name === 'CastError') {
-      return res.status(ERROR_FIND).send({ message: `Карточка с id: ${req.params.cardId} не найдена` });
+      return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
     } else {
       return res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
     }
@@ -63,14 +69,14 @@ module.exports.deleteLike = (req, res) => {
   )
   .then(card => {
     if(card === null) {
-      return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
+      return res.status(ERROR_FIND).send({ message: `Карточка с id: ${req.params.cardId} не найдена` });
     } else {
       res.send({ data: card })
     }
   })
   .catch((err) => {
     if(err.name === 'CastError') {
-      return res.status(ERROR_FIND).send({ message: `Карточка с id: ${req.params.cardId} не найдена` });
+      return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
     } else {
       return res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
     }

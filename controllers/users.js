@@ -11,14 +11,14 @@ module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
     .then(user => {
       if(user === null) {
-        return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
+        return res.status(ERROR_FIND).send({ message: `Пользователь с id: ${req.params.userId} не найден` });
       } else {
         res.send({ data: user })
       }
     })
     .catch((err) => {
       if(err.name === 'CastError') {
-        return res.status(ERROR_FIND).send({ message: `Пользователь с id: ${req.params.userId} не найден` });
+        return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
       } else {
         return res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
       }
