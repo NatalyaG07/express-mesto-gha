@@ -1,15 +1,22 @@
 const User = require("../models/user");
+const { ERROR_DATA, ERROR_FIND, ERROR_DEFAULT } = require('../utils/constants');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then(Users => res.send({ data: Users }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' }));
 };
 
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
     .then(user => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if(err.name === 'CastError') {
+        return res.status(ERROR_FIND).send({ message: `Пользователь с id: ${req.params.userId} не найден` });
+      } else {
+        return res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+      }
+  });
 };
 
 module.exports.createUser = (req, res) => {
@@ -17,23 +24,41 @@ module.exports.createUser = (req, res) => {
 
   User.create({ name, about, avatar })                 // создадим документ на основе пришедших данных
     .then(user => res.send({ data: user }))            // вернём записанные в базу данные
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
+      } else {
+        return res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+      }
+  });
 };
 
 module.exports.editProfile = (req, res) => {
-  User.findOneAndUpdate({ _id: '6322f4089a7a7fd010a62b7f' }, { name: req.body.name }, {
+  User.findOneAndUpdate({ _id: req.user._id }, { name: req.body.name }, {
     new: true,                                          // обработчик then получит на вход обновлённую запись
     runValidators: true,                                // данные будут валидированы перед изменением
-})
+  })
     .then(user => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
+      } else {
+        return res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+      }
+  });
 };
 
 module.exports.editAvatar = (req, res) => {
-  User.findOneAndUpdate({ _id: '6322f4089a7a7fd010a62b7f' }, { avatar: req.body.avatar }, {
+  User.findOneAndUpdate({ _id: req.user._id }, { avatar: req.body.avatar }, {
     new: true,                                          // обработчик then получит на вход обновлённую запись
     runValidators: true,                                // данные будут валидированы перед изменением
-})
+  })
     .then(user => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
+      } else {
+        return res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+      }
+  });
 };

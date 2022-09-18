@@ -1,9 +1,10 @@
 const Card = require('../models/card');
+const { ERROR_DATA, ERROR_FIND, ERROR_DEFAULT } = require('../utils/constants');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then(Cards => res.send({ data: Cards }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' }));
 };
 
 module.exports.createCard = (req, res) => {
@@ -11,13 +12,25 @@ module.exports.createCard = (req, res) => {
 
   Card.create({ name, link, owner: req.user._id })
     .then(Card => res.send({ data: Card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
+      } else {
+        return res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+      }
+  });
 };
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then(card => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if(err.name === 'CastError') {
+        return res.status(ERROR_FIND).send({ message: `Карточка с id: ${req.params.cardId} не найдена` });
+      } else {
+        return res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+      }
+  });
 };
 
 module.exports.addLike = (req, res) => {
@@ -27,7 +40,15 @@ module.exports.addLike = (req, res) => {
     { new: true },
   )
   .then(card => res.send({ data: card }))
-  .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+  .catch((err) => {
+    if(err.name === 'CastError') {
+      return res.status(ERROR_FIND).send({ message: `Карточка с id: ${req.params.cardId} не найдена` });
+    } else if (err.name === 'ValidationError') {
+      return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
+    } else {
+      return res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+    }
+  });
 };
 
 module.exports.deleteLike = (req, res) => {
@@ -37,5 +58,13 @@ module.exports.deleteLike = (req, res) => {
     { new: true },
   )
   .then(card => res.send({ data: card }))
-  .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+  .catch((err) => {
+    if(err.name === 'CastError') {
+      return res.status(ERROR_FIND).send({ message: `Карточка с id: ${req.params.cardId} не найдена` });
+    } else if (err.name === 'ValidationError') {
+      return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
+    } else {
+      return res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+    }
+  });
 };

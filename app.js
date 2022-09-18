@@ -5,9 +5,7 @@ const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
 
 const app = express();
-app.listen(3000, () => {
-  console.log("Сервер запущен!!! Ура!!!")
-});
+app.listen(3000);
 
 app.use(bodyParser.json());
 app.use((req, res, next) => {
