@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "lint": "eslint"
+    "lint": "npx eslint"
   },
   "author": "Natalya Gontsa",
   "license": "ISC",
@@ -16,10 +16,9 @@
     "mongoose": "^6.6.0"
   },
   "devDependencies": {
-    "eslint": "^8.23.0",
-    "eslint-plugin-react": "^7.31.7",
+    "eslint": "^8.2.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-import": "^2.25.2",
     "nodemon": "^2.0.19"
   }
 }
