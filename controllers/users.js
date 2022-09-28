@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const { ERROR_DATA, ERROR_FIND, ERROR_DEFAULT } = require('../utils/constants');
 
@@ -25,9 +26,21 @@ module.exports.getUserById = (req, res) => {
 };
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body; // получим из объекта запроса данные пользователя
+  const {
+    name,
+    about,
+    avatar,
+    email,
+  } = req.body; // получим из объекта запроса данные пользователя
 
-  User.create({ name, about, avatar }) // создадим документ на основе пришедших данных
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    })) // создадим документ на основе пришедших данных
     .then((user) => res.send({ data: user })) // вернём записанные в базу данные
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -67,3 +80,7 @@ module.exports.editAvatar = (req, res) => {
       }
     });
 };
+
+// module.exports.login = (req, res) => {
+
+// };
