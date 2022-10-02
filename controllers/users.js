@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { ERROR_DATA, ERROR_FIND, ERROR_DEFAULT } = require('../utils/constants');
 
@@ -81,6 +82,37 @@ module.exports.editAvatar = (req, res) => {
     });
 };
 
-// module.exports.login = (req, res) => {
+module.exports.login = (req, res) => { // контроллер аутентификации
+  const { email, password } = req.body;
 
-// };
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
+
+      res.cookie('jwt', token, {
+        maxAge: 3600000 * 24 * 7,
+        httpOnly: true,
+      });
+      res.send({ token });
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.massage });
+    });
+};
+
+module.exports.getInfoAboutMe = (req, res) => {
+  User.findById(req.user._id)
+    .orFail()
+    .then((user) => {
+      res.send({ data: user });
+    })
+    .catch((err) => {
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(ERROR_FIND).send({ message: `Пользователь с id: ${req.user._id} не найден` });
+      } else if (err.name === 'CastError') {
+        res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
+      } else {
+        res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+      }
+    });
+};
