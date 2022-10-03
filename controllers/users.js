@@ -2,14 +2,16 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { ERROR_DATA, ERROR_FIND, ERROR_DEFAULT } = require('../utils/constants');
+const NotFoundError = require('../errors/not-found-err');
+const DataError = require('../errors/default-err');
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' }));
+    .catch(next);
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail()
     .then((user) => {
@@ -17,16 +19,16 @@ module.exports.getUserById = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        res.status(ERROR_FIND).send({ message: `Пользователь с id: ${req.params.userId} не найден` });
+        next(new NotFoundError('Пользователь с id не найден'));
       } else if (err.name === 'CastError') {
-        res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
+        next(new DataError('Переданы некорректные данные'));
       } else {
-        res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+        next(err);
       }
     });
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name,
     about,
@@ -44,25 +46,26 @@ module.exports.createUser = (req, res) => {
     })) // создадим документ на основе пришедших данных
     .then((user) => res.send({ data: user })) // вернём записанные в базу данные
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
+      if (err.name === 'CastError') {
+        next(new DataError('Переданы некорректные данные'));
       } else {
-        res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+        next(err);
       }
     });
 };
 
-module.exports.editProfile = (req, res) => {
+module.exports.editProfile = (req, res, next) => {
   User.findOneAndUpdate({ _id: req.user._id }, { name: req.body.name, about: req.body.about }, {
     new: true, // обработчик then получит на вход обновлённую запись
     runValidators: true, // данные будут валидированы перед изменением
   })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные' });
+      console.log(err);
+      if (err.name === 'CastError') {
+        next(new DataError('Переданы некорректные данные'));
       } else {
-        res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+        next(err);
       }
     });
 };
