@@ -15,6 +15,7 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.getUserById = (req, res, next) => {
+  console.log(req.params);
   User.findById(req.params.userId)
     .orFail()
     .then((user) => {
