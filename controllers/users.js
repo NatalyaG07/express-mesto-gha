@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
-const DataError = require('../errors/default-err');
+const DataError = require('../errors/data-err');
 const ConflictError = require('../errors/conflict-error');
 
 module.exports.getUsers = (req, res, next) => {
@@ -19,7 +19,7 @@ module.exports.getUserById = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        next(new NotFoundError('Пользователь с id не найден'));
+        next(new NotFoundError('Пользователь не найден'));
       } else if (err.name === 'CastError') {
         next(new DataError('Переданы некорректные данные'));
       } else {
