@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { celebrate, Joi, errors } = require('celebrate');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
 const {
@@ -10,16 +12,24 @@ const {
   createUser,
 } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const NotFoundError = require('./errors/not-found-err');
 
-const app = express();
-app.listen(3000);
-
-app.use(bodyParser.json());
-app.use(cookieParser());
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // за 15 минут
+  max: 100, // можно совершить максимум 100 запросов с одного IP
+});
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
+
+const app = express();
+app.listen(3000);
+
+app.use(helmet());
+app.use(limiter); // подключаем rate-limiter
+app.use(bodyParser.json());
+app.use(cookieParser());
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -44,6 +54,9 @@ app.use(auth);
 
 app.use('/users', routerUsers);
 app.use('/cards', routerCards);
+app.use('*', (req, res, next) => {
+  next(new NotFoundError('Страница не найдена'));
+});
 
 app.use(errors());
 
@@ -59,7 +72,3 @@ app.use((err, req, res, next) => {
     });
   next();
 });
-
-// app.use('*', (req, res) => {
-//   res.status(404).send({ message: 'Страница не найдена' });
-// });

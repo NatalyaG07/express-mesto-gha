@@ -28,7 +28,7 @@ module.exports.deleteCard = (req, res, next) => {
     .orFail()
     .then((card) => {
       if (req.user._id === card.owner) {
-        res.send({ data: card });
+        res.status(200).send({ data: card });
       } else {
         next(new AccessError('Попытка удаления чужой карточки'));
       }
@@ -52,7 +52,7 @@ module.exports.addLike = (req, res, next) => {
   )
     .orFail()
     .then((card) => {
-      res.send({ data: card });
+      res.status(200).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
