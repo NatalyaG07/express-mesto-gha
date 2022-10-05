@@ -27,10 +27,10 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail()
     .then((card) => {
-      if (req.user._id === card.owner) {
-        res.status(200).send({ data: card });
-      } else {
+      if (card.owner.valueOf() !== req.user._id) {
         next(new AccessError('Попытка удаления чужой карточки'));
+      } else {
+        res.status(200).send({ data: card });
       }
     })
     .catch((err) => {
