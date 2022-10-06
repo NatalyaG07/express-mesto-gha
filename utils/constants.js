@@ -1,3 +1,1 @@
-module.exports.ERROR_DATA = 400;
-module.exports.ERROR_FIND = 404;
-module.exports.ERROR_DEFAULT = 500;
+module.exports.urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;

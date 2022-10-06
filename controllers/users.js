@@ -18,7 +18,7 @@ module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail()
     .then((user) => {
-      res.status(200).send({ data: user });
+      res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
@@ -72,7 +72,7 @@ module.exports.editProfile = (req, res, next) => {
   })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         next(new DataError('Переданы некорректные данные'));
       } else {
         next(err);
@@ -106,7 +106,7 @@ module.exports.login = (req, res, next) => { // контроллер аутен�
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
       });
-      res.status(200).send({
+      res.send({
         token,
         name: user.name,
         email: user.email,
@@ -127,8 +127,6 @@ module.exports.getInfoAboutMe = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
         next(new NotFoundError('Пользователь с id не найден'));
-      } else if (err.name === 'CastError') {
-        next(new DataError('Переданы некорректные данные'));
       } else {
         next(err);
       }

@@ -24,24 +24,16 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    .orFail()
+  Card.findById(req.params.cardId)
+    .orFail(() => new NotFoundError('Карточка не найдена'))
     .then((card) => {
       if (card.owner.valueOf() !== req.user._id) {
-        next(new AccessError('Попытка удаления чужой карточки'));
-      } else {
-        res.status(200).send({ data: card });
+        return next(new AccessError('Попытка удаления чужой карточки'));
       }
+      return card.remove()
+        .then(() => res.send({ message: 'Карточка удалена' }));
     })
-    .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        next(new NotFoundError('Карточка не найдена'));
-      } else if (err.name === 'CastError') {
-        next(new DataError('Переданы некорректные данные'));
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
 module.exports.addLike = (req, res, next) => {
