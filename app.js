@@ -9,6 +9,8 @@ const { errors } = require('celebrate');
 const allRouters = require('./routes/index');
 const errorHandler = require('./middlewares/errorHandler');
 
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // за 15 минут
   max: 100, // можно совершить максимум 100 запросов с одного IP
@@ -26,8 +28,10 @@ app.use(limiter); // подключаем rate-limiter
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+app.use(requestLogger); // Логгер запросов нужно подключить до всех обработчиков роутов
 app.use(allRouters);
 
+app.use(errorLogger); // нужно подключить после обработчиков роутов и до обработчиков ошибок
 app.use(errors());
 
 app.use(errorHandler);
