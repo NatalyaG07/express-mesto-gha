@@ -5,12 +5,12 @@ const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const { errors } = require('celebrate');
+const cors = require('cors');
 
 const allRouters = require('./routes/index');
 const errorHandler = require('./middlewares/errorHandler');
 
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const cors = require('./middlewares/cors');
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // за 15 минут
@@ -29,7 +29,7 @@ app.use(limiter); // подключаем rate-limiter
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-app.use(cors);
+app.use(cors());
 
 app.use(requestLogger); // Логгер запросов нужно подключить до всех обработчиков роутов
 app.use(allRouters);
