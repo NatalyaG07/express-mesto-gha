@@ -5,11 +5,12 @@ const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const { errors } = require('celebrate');
+const cors = require('cors');
 
 const allRouters = require('./routes/index');
 const errorHandler = require('./middlewares/errorHandler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { cors } = require('./middlewares/cors');
+// const { cors } = require('./middlewares/cors');
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // за 15 минут
@@ -23,7 +24,11 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 const app = express();
 app.listen(3000);
 
-app.use(cors);
+// app.use(cors);
+app.use(cors({
+  origin: 'https://mesto.natalya.g.nomoredomains.icu',
+  credentials: true,
+}));
 
 app.use(helmet());
 app.use(limiter); // подключаем rate-limiter
