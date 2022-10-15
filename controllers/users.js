@@ -7,6 +7,7 @@ const DataError = require('../errors/data-err');
 const ConflictError = require('../errors/conflict-error');
 
 // const JWT_SECRET = crypto.randomBytes(16).toString('hex');
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -100,7 +101,10 @@ module.exports.login = (req, res, next) => { // контроллер аутен�
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'd072541c878f9777901edd5acf90ec5d', { expiresIn: '7d' });
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+      );
 
       res.cookie('jwt', token, {
         maxAge: 3600000 * 24 * 7,
