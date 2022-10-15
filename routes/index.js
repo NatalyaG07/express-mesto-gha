@@ -8,6 +8,11 @@ const { login, createUser } = require('../controllers/users');
 const NotFoundError = require('../errors/not-found-err');
 const { urlRegex } = require('../utils/constants');
 
+router.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 router.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -15,6 +20,11 @@ router.post('/signin', celebrate({
   }),
 }), login);
 
+router.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 router.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
