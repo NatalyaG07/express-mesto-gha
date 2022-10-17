@@ -106,12 +106,12 @@ module.exports.login = (req, res, next) => { // контроллер аутен�
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
       );
 
-      res.cookie('jwt', token, {
-        maxAge: 3600000 * 24 * 7,
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-      });
+      // res.cookie('jwt', token, {
+      //   maxAge: 3600000 * 24 * 7,
+      //   httpOnly: true,
+      //   secure: true,
+      //   sameSite: 'none',
+      // });
       res.send({
         token,
         name: user.name,
