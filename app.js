@@ -27,7 +27,10 @@ app.listen(3000);
 
 // app.use(cors);
 app.use(cors({
-  origin: 'https://mesto.natalya.g.nomoredomains.icu',
+  origin: [
+    'https://mesto.natalya.g.nomoredomains.icu',
+    'http://mesto.natalya.g.nomoredomains.icu',
+  ],
   credentials: true,
 }));
 
