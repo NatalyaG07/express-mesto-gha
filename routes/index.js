@@ -37,9 +37,9 @@ router.post('/signup', celebrate({
 
 router.use(auth);
 
-router.get('/signout', (req, res) => {
-  res.clearCookie('jwt').send({ message: 'Выход' });
-});
+// router.get('/signout', (req, res) => {
+//   res.clearCookie('jwt').send({ message: 'Выход' });
+// });
 
 router.use('/users', routerUsers);
 router.use('/cards', routerCards);

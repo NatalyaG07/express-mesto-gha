@@ -129,6 +129,7 @@ module.exports.getInfoAboutMe = (req, res, next) => {
     .orFail()
     .then((user) => {
       res.send({ data: user });
+      console.log(user);
     })
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {

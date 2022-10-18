@@ -5,11 +5,16 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 
 // eslint-disable-next-line consistent-return
 module.exports = (req, res, next) => {
-  const token = req.cookies.jwt;
-  if (!token) {
+  // достаём авторизационный заголовок
+  const { authorization } = req.headers;
+
+  // убеждаемся, что он есть или начинается с Bearer
+  if (!authorization || !authorization.startsWith('Bearer ')) {
     return next(new AuthError('Необходима авторизация'));
   }
 
+  // извлечём токен
+  const token = authorization.replace('Bearer ', '');
   let payload;
 
   try {
