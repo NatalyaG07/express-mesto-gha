@@ -1,12 +1,10 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-// const crypto = require('crypto');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const DataError = require('../errors/data-err');
 const ConflictError = require('../errors/conflict-error');
 
-// const JWT_SECRET = crypto.randomBytes(16).toString('hex');
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports.getUsers = (req, res, next) => {
@@ -129,7 +127,6 @@ module.exports.getInfoAboutMe = (req, res, next) => {
     .orFail()
     .then((user) => {
       res.send({ data: user });
-      console.log(user);
     })
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {

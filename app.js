@@ -31,7 +31,7 @@ app.use(cors({
     'https://mesto.natalya.g.nomoredomains.icu',
     'http://mesto.natalya.g.nomoredomains.icu',
   ],
-  // credentials: true,
+  credentials: true,
 }));
 
 app.use(helmet());
